@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم ثبت غیبت دانش‌آموزان</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        input, select {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .students-table th,
+        .students-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .students-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .students-table tr:hover {
+            background: #f3f4f6;
+        }
+        
+        .checkbox-cell {
+            text-align: center;
+        }
+        
+        .checkbox-cell input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .report-box {
+            background: #f3f4f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            direction: rtl;
+            min-height: 100px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .info-box {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-box ul {
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏫 سیستم مدیریت غیبت دانش‌آموزان</h1>
+            <p>ثبت و مدیریت غیبت‌های روزانه</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="add">➕ افزودن دانش‌آموز</button>
+            <button class="tab-btn" data-tab="absence">✅ ثبت غیبت</button>
+            <button class="tab-btn" data-tab="report">📊 گزارش مدیر</button>
+        </div>
+        
+        <!-- تب افزودن دانش‌آموز -->
+        <div id="add-tab" class="tab-content active">
+            <div class="form-section">
+                <h2>📂 آپلود فایل اکسل (برای تعداد زیاد)</h2>
+                <div class="info-box">
+                    <p style="margin-bottom: 10px;"><strong>📋 فرمت فایل اکسل:</strong></p>
+                    <p>فایل اکسل شما باید دقیقاً این ستون‌ها را داشته باشد:</p>
+                    <p style="margin: 10px 0; font-family: monospace; background: white; padding: 10px; border-radius: 5px;">
+                        نام | نام خانوادگی | پایه | کلاس | معلم
+                    </p>
+                    <p style="color: #dc2626;"><strong>⚠️ نکات مهم:</strong></p>
+                    <ul>
+                        <li>سطر اول باید عنوان ستون‌ها باشد</li>
+                        <li>پایه باید: اول، دوم یا سوم باشد</li>
+                        <li>کلاس باید عدد بین 1 تا 6 باشد</li>
+                        <li><strong>وارد کردن فایل جدید، لیست قبلی را پاک می‌کند</strong></li>
+                    </ul>
+                </div>
+                <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" style="margin-bottom: 10px;">
+                <button class="btn btn-primary" id="upload-btn">📤 بارگذاری فایل اکسل</button>
+                <button class="btn btn-success" id="download-template-btn">📥 دانلود نمونه فایل اکسل</button>
+                <div id="upload-message" class="success-message"></div>
+            </div>
+            
+            <div class="form-section">
+                <h2>افزودن دانش‌آموز جدید (تک‌به‌تک)</h2>
+                <form id="student-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>نام:</label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>نام خانوادگی:</label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>پایه:</label>
+                            <select id="grade" required>
+                                <option value="">انتخاب کنید</option>
+                                <option value="اول">اول</option>
+                                <option value="دوم">دوم</option>
+                                <option value="سوم">سوم</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>کلاس:</label>
+                            <select id="classNum" required>
+                                <option value="">انتخاب کنید</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>معلم کلاس:</label>
+                            <input type="text" id="teacher" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">افزودن دانش‌آموز</button>
+                </form>
+                <div id="add-message" class="success-message"></div>
+            </div>
+            
+            <div class="form-section">
+                <h2>لیست دانش‌آموزان ثبت شده (تعداد: <span id="student-count">0</span>)</h2>
+                <div id="students-list"></div>
+            </div>
+        </div>
+        
+        <!-- تب ثبت غیبت -->
+        <div id="absence-tab" class="tab-content">
+            <div class="form-section">
+                <h2>ثبت غیبت امروز</h2>
+                <div class="filter-section">
+                    <div class="form-group">
+                        <label>فیلتر پایه:</label>
+                        <select id="filter-grade">
+                            <option value="">همه پایه‌ها</option>
+                            <option value="اول">اول</option>
+                            <option value="دوم">دوم</option>
+                            <option value="سوم">سوم</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>فیلتر کلاس:</label>
+                        <select id="filter-class">
+                            <option value="">همه کلاس‌ها</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="absence-table"></div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" id="save-absences-btn">💾 ذخیره غیبت‌ها</button>
+                    <button class="btn btn-danger" id="clear-absences-btn">🗑️ پاک کردن همه</button>
+                </div>
+                <div id="absence-message" class="success-message"></div>
+            </div>
+        </div>
+        
+        <!-- تب گزارش مدیر -->
+        <div id="report-tab" class="tab-content">
+            <div class="form-section">
+                <h2>گزارش غیبت برای اولیا</h2>
+                <button class="btn btn-primary" id="generate-report-btn">📝 تولید گزارش</button>
+                <button class="btn btn-success" id="copy-report-btn" style="margin-right: 10px;">📋 کپی گزارش</button>
+                <div id="report-content" class="report-box">برای تولید گزارش، روی دکمه "تولید گزارش" کلیک کنید</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let students = [];
+        let absences = {};
+        const today = new Date().toLocaleDateString('fa-IR');
+
+        // تابع نمایش پیام موفقیت
+        function showSuccessMessage(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.classList.add('show');
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 3000);
+        }
+
+        // بارگذاری داده‌ها از حافظه
+        function loadData() {
+            const saved = localStorage.getItem('students');
+            if (saved) {
+                try {
+                    students = JSON.parse(saved);
+                } catch(e) {
+                    students = [];
+                }
+            }
+            const savedAbsences = localStorage.getItem('absences_' + today);
+            if (savedAbsences) {
+                try {
+                    absences = JSON.parse(savedAbsences);
+                } catch(e) {
+                    absences = {};
+                }
+            }
+        }
+
+        // ذخیره داده‌ها
+        function saveData() {
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('absences_' + today, JSON.stringify(absences));
+        }
+
+        // مرتب‌سازی دانش‌آموزان بر اساس الفبا
+       function sortStudents() {
+    students.sort((a, b) => {
+        // ابتدا بر اساس نام خانوادگی
+        const lastNameCompare = a.lastName.localeCompare(b.lastName, 'fa');
+        if (lastNameCompare !== 0) {
+            return lastNameCompare;
+        }
+        // اگر نام خانوادگی یکسان بود، بر اساس نام
+        return a.firstName.localeCompare(b.firstName, 'fa');
+    });
+}
+
+        // تغییر تب
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                
+                document.getElementById(tab + '-tab').classList.add('active');
+                this.classList.add('active');
+                
+                if (tab === 'absence') {
+                    renderAbsenceTable();
+                } else if (tab === 'report') {
+                    generateReport();
+                } else if (tab === 'add') {
+                    renderStudentsList();
+                }
+            });
+        });
+
+        // افزودن دانش‌آموز
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const student = {
+                id: Date.now(),
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                grade: document.getElementById('grade').value,
+                classNum: document.getElementById('classNum').value,
+                teacher: document.getElementById('teacher').value.trim()
+            };
+            
+            students.push(student);
+            sortStudents();
+            saveData();
+            this.reset();
+            renderStudentsList();
+            showSuccessMessage('add-message', '✅ دانش‌آموز با موفقیت اضافه شد!');
+        });
+
+        // نمایش لیست دانش‌آموزان
+        function renderStudentsList() {
+            const container = document.getElementById('students-list');
+            document.getElementById('student-count').textContent = students.length;
+            
+            if (students.length === 0) {
+                container.innerHTML = '<div class="empty-state">هنوز دانش‌آموزی ثبت نشده است</div>';
+                return;
+            }
+            
+            sortStudents();
+            
+            let html = '<table class="students-table"><tr><th>ردیف</th><th>نام</th><th>نام خانوادگی</th><th>پایه</th><th>کلاس</th><th>معلم</th><th>عملیات</th></tr>';
+            
+            students.forEach((s, index) => {
+                html += `<tr>
+                    <td>${index + 1}</td>
+                    <td>${s.firstName}</td>
+                    <td>${s.lastName}</td>
+                    <td>${s.grade}</td>
+                    <td>${s.classNum}</td>
+                    <td>${s.teacher}</td>
+                    <td><button class="btn btn-danger delete-btn" data-id="${s.id}">حذف</button></td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            container.innerHTML = html;
+
+            // اضافه کردن event listener برای دکمه‌های حذف
+            container.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    deleteStudent(id);
+                });
+            });
+        }
+
+        // حذف دانش‌آموز
+        function deleteStudent(id) {
+            if (confirm('آیا مطمئن هستید که می‌خواهید این دانش‌آموز را حذف کنید؟')) {
+                students = students.filter(s => s.id !== id);
+                saveData();
+                renderStudentsList();
+                showSuccessMessage('add-message', '✅ دانش‌آموز با موفقیت حذف شد');
+            }
+        }
+
+        // فیلتر دانش‌آموزان
+        document.getElementById('filter-grade').addEventListener('change', renderAbsenceTable);
+        document.getElementById('filter-class').addEventListener('change', renderAbsenceTable);
+
+        // نمایش جدول غیبت
+        function renderAbsenceTable() {
+            const container = document.getElementById('absence-table');
+            const filterGrade = document.getElementById('filter-grade').value;
+            const filterClass = document.getElementById('filter-class').value;
+            
+            let filtered = students.filter(s => {
+                return (!filterGrade || s.grade === filterGrade) &&
+                       (!filterClass || s.classNum === filterClass);
+            });
+
+            // مرتب‌سازی
+            filtered.sort((a, b) => {
+                const lastNameA = a.lastName + ' ' + a.lastName;
+                const lastNameB = b.lastNamee + ' ' + b.lastName;
+                return lastNameB.localeCompare(lastNameA, 'fa');
+            });
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state">دانش‌آموزی یافت نشد</div>';
+                return;
+            }
+            
+            let html = '<table class="students-table"><tr><th>ردیف</th><th>نام و نام خانوادگی</th><th>پایه</th><th>کلاس</th><th>معلم</th><th>غایب</th></tr>';
+            
+            filtered.forEach((s, index) => {
+                const isAbsent = absences[s.id] || false;
+                html += `<tr>
+                    <td>${index + 1}</td>
+                    <td>${s.firstName} ${s.lastName}</td>
+                    <td>${s.grade}</td>
+                    <td>${s.classNum}</td>
+                    <td>${s.teacher}</td>
+                    <td class="checkbox-cell">
+                        <input type="checkbox" ${isAbsent ? 'checked' : ''} 
+                               class="absence-checkbox" data-student-id="${s.id}">
+                    </td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            container.innerHTML = html;
+            
+            // اضافه کردن event listener برای چک باکس‌ها
+            container.querySelectorAll('.absence-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const studentId = parseInt(this.getAttribute('data-student-id'));
+                    absences[studentId] = this.checked;
+                });
+            });
+        }
+
+        // ذخیره غیبت‌ها
+        document.getElementById('save-absences-btn').addEventListener('click', function() {
+            saveData();
+            showSuccessMessage('absence-message', '✅ غیبت‌ها با موفقیت ثبت شد!');
+        });
+
+        // پاک کردن غیبت‌ها
+        document.getElementById('clear-absences-btn').addEventListener('click', function() {
+            if (confirm('آیا مطمئن هستید که می‌خواهید همه غیبت‌ها را پاک کنید؟')) {
+                absences = {};
+                saveData();
+                renderAbsenceTable();
+                showSuccessMessage('absence-message', '✅ همه غیبت‌ها پاک شد');
+            }
+        });
+
+        // تولید گزارش
+        function generateReport() {
+            const container = document.getElementById('report-content');
+            
+            const absentStudents = students.filter(s => absences[s.id]);
+            
+            if (absentStudents.length === 0) {
+                container.textContent = 'امروز هیچ دانش‌آموزی غیبت نداشته است. 🎉';
+                return;
+            }
+            
+            let report = `📋 گزارش غیبت دانش‌آموزان\n`;
+            report += `📅 تاریخ: ${today}\n`;
+            report += `📊 تعداد غایبین: ${absentStudents.length} نفر\n\n`;
+            report += `─────────────────────────────\n\n`;
+            
+            // گروه‌بندی بر اساس پایه و کلاس
+            const grouped = {};
+            absentStudents.forEach(s => {
+                const key = `پایه ${s.grade} - کلاس ${s.classNum}`;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(s);
+            });
+            
+            // مرتب‌سازی گروه‌ها
+            const sortedKeys = Object.keys(grouped).sort();
+            
+            sortedKeys.forEach(key => {
+                report += `📚 ${key}\n`;
+                report += `👨‍🏫 معلم: ${grouped[key][0].teacher}\n\n`;
+                
+                // مرتب‌سازی دانش‌آموزان در هر گروه
+                grouped[key].sort((a, b) => {
+                    const nameA = a.firstName + ' ' + a.lastName;
+                    const nameB = b.firstName + ' ' + b.lastName;
+                    return nameA.localeCompare(nameB, 'fa');
+                });
+                
+                grouped[key].forEach((s, i) => {
+                    report += `   ${i + 1}. ${s.firstName} ${s.lastName}\n`;
+                });
+                report += `\n`;
+            });
+            
+            report += `─────────────────────────────\n`;
+            report += `\n🙏 لطفاً در اسرع وقت جهت موجه کردن غیبت اقدام نمایید.`;
+            
+            container.textContent = report;
+        }
+
+        document.getElementById('generate-report-btn').addEventListener('click', function() {
+            generateReport();
+        });
+
+        // کپی گزارش
+        document.getElementById('copy-report-btn').addEventListener('click', function() {
+            const report = document.getElementById('report-content').textContent;
+            if (report && report !== 'برای تولید گزارش، روی دکمه "تولید گزارش" کلیک کنید') {
+                navigator.clipboard.writeText(report).then(() => {
+                    alert('✅ گزارش کپی شد!');
+                }).catch(() => {
+                    alert('❌ خطا در کپی کردن. لطفاً دوباره تلاش کنید.');
+                });
+            } else {
+                alert('⚠️ ابتدا گزارش را تولید کنید');
+            }
+        });
+
+        // آپلود فایل اکسل
+        document.getElementById('upload-btn').addEventListener('click', function() {
+            const fileInput = document.getElementById('excel-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('❌ لطفاً یک فایل انتخاب کنید!');
+                return;
+            }
+
+            if (students.length > 0) {
+                if (!confirm('⚠️ با آپلود فایل جدید، تمام دانش‌آموزان قبلی پاک می‌شوند.\n\nآیا مطمئن هستید؟')) {
+                    return;
+                }
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    // پاک کردن لیست قبلی
+                    students = [];
+                    
+                    let successCount = 0;
+                    let errorCount = 0;
+                    
+                    rows.forEach((row, index) => {
+                        const firstName = row['نام'] || row['name'] || row['Name'];
+                        const lastName = row['نام خانوادگی'] || row['نام_خانوادگی'] || row['family'] || row['Family'];
+                        const grade = row['پایه'] || row['grade'] || row['Grade'];
+                        const classNum = row['کلاس'] || row['class'] || row['Class'];
+                        const teacher = row['معلم'] || row['teacher'] || row['Teacher'];
+                        
+                        if (firstName && lastName && grade && classNum && teacher) {
+                            students.push({
+                                id: Date.now() + index,
+                                firstName: String(firstName).trim(),
+                                lastName: String(lastName).trim(),
+                                grade: String(grade).trim(),
+                                classNum: String(classNum).trim(),
+                                teacher: String(teacher).trim()
+                            });
+                            successCount++;
+                        } else {
+                            errorCount++;
+                        }
+                    });
+                    
+                    sortStudents();
+                    saveData();
+                    renderStudentsList();
+                    fileInput.value = '';
+                    
+                    showSuccessMessage('upload-message', `✅ بارگذاری انجام شد!\n✔️ موفق: ${successCount} دانش‌آموز | ❌ خطا: ${errorCount} ردیف`);
+                    
+                } catch (error) {
+                    alert('❌ خطا در خواندن فایل!\n\nلطفاً مطمئن شوید فایل اکسل معتبر است.');
+                    console.error(error);
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        });
+
+        // دانلود نمونه فایل اکسل
+        document.getElementById('download-template-btn').addEventListener('click', function() {
+            const template = [
+                ['نام', 'نام خانوادگی', 'پایه', 'کلاس', 'معلم'],
+                ['علی', 'احمدی', 'اول', '1', 'خانم رضایی'],
+                ['زهرا', 'محمدی', 'اول', '1', 'خانم رضایی'],
+                ['حسین', 'کریمی', 'دوم', '2', 'آقای حسینی'],
+                ['فاطمه', 'نوری', 'سوم', '3', 'خانم صالحی']
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(template);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'دانش‌آموزان');
+            
+            XLSX.writeFile(wb, 'نمونه_لیست_دانش_آموزان.xlsx');
+        });
+
+        // بارگذاری اولیه
+        loadData();
+        renderStudentsList();
+    </script>
+</body>
+</html>
